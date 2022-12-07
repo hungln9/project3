@@ -184,36 +184,36 @@ jobs:
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image: python:3.7-alpine
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["08:ba:54:4e:a3:e9:1f:91:cf:34:4f:bb:e2:de:a5:c1"]
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add ansible openssh-client tar unzip
-  #           apk add --update ansible openssh-client tar unzip
-  #           cat .circleci/ansible/inventory.txt
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["7c:89:c1:99:d1:dc:7f:48:65:0c:f4:21:c6:18:51:e9"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add ansible openssh-client tar unzip
+            apk add --update ansible openssh-client tar unzip
+            cat .circleci/ansible/inventory.txt
 
-  #     - run:
-  #         name: Install AWS-CLI for Ansible
-  #         command: |
-  #           apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+      - run:
+          name: Install AWS-CLI for Ansible
+          command: |
+            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
 
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           ansible-playbook \
-  #             -i .circleci/ansible/inventory.txt \
-  #             .circleci/ansible/configure-server.yml
-  #     # Here's where you will add some code to rollback on failure
-  #     - destroy-environment:
-  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Configure server
+          command: |
+            ansible-playbook \
+              -i .circleci/ansible/inventory.txt \
+              .circleci/ansible/configure-server.yml
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
   # run-migrations:
   #   docker:
