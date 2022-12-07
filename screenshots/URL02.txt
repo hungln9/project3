@@ -1,0 +1,2 @@
+http://udapeople-2a1ad2f.s3-website-us-east-1.amazonaws.com/#/employees
+http://dy1b4kjx7qkao.cloudfront.net/#/employees
