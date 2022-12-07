@@ -32,7 +32,7 @@ commands:
           when: on_fail
           command: |
             echo "Reverting Database  ########### "
-            SUCCESS=$(curl --insecure https://kvdb.io/63vbmnEzTac6vpR5QLJMK9/migration_<<parameters.workflow_id>>)
+            SUCCESS=$(curl --insecure https://kvdb.io/WwrG1rKzrzdBiyWX5Q3YgW/migration_<<parameters.workflow_id>>)
             if (( $SUCCESS == 1 ));
             then
               cd ~/project/backend
@@ -252,46 +252,46 @@ jobs:
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
-  # deploy-frontend:
-  #   docker:
-  #     - image: python:3.7-alpine3.16
-  #   steps:
-  #     # Checkout code from git
-  #     - checkout
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update --no-cache tar gzip nodejs npm aws-cli
-  #     - restore_cache:
-  #         keys: [frontend-build]
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           export BACKEND_IP=$(aws ec2 describe-instances \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-  #             --output text)
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "API_URL = ${API_URL}"
-  #           echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
-  #           cat frontend/.env
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           cd frontend
-  #           npm install
-  #           npm run build
-  #           tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-  #           aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-  #     # Here's where you will add some code to rollback on failure
-  #     - destroy-environment:
-  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
-  #     - revert-migrations:
-  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
-  #     - destroy-environment:
-  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
-  #     - revert-migrations:
-  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+  deploy-frontend:
+    docker:
+      - image: python:3.7-alpine3.16
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip nodejs npm aws-cli
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
   # deploy-backend:
   #   docker:
@@ -399,7 +399,7 @@ jobs:
   #           echo $OldWorkflowID >> ~/OldWorkflowID.txt
   #           cat ~/OldWorkflowID.txt
             
-  #           curl https://kvdb.io/63vbmnEzTac6vpR5QLJMK9/${CIRCLE_WORKFLOW_ID:0:7} -d $OldWorkflowID
+  #           curl https://kvdb.io/WwrG1rKzrzdBiyWX5Q3YgW/${CIRCLE_WORKFLOW_ID:0:7} -d $OldWorkflowID
 
   #           aws cloudformation deploy \
   #             --template-file .circleci/files/cloudfront.yml \
@@ -427,7 +427,7 @@ jobs:
   #         name: Get old stack workflow id
   #         command: |
   #           # Fetch the Old workflow ID
-  #           OldWorkflowID=$(curl --insecure https://kvdb.io/63vbmnEzTac6vpR5QLJMK9/${CIRCLE_WORKFLOW_ID:0:7})
+  #           OldWorkflowID=$(curl --insecure https://kvdb.io/WwrG1rKzrzdBiyWX5Q3YgW/${CIRCLE_WORKFLOW_ID:0:7})
   #           echo OldWorkflowID: $OldWorkflowID
   #           echo Current Workflow ID: ${CIRCLE_WORKFLOW_ID:0:7}
   #           # Fetch the stack names
@@ -437,7 +437,7 @@ jobs:
   #     - run:
   #         name: Remove old stacks and files
   #         command: |
-  #           OldWorkflowID=$(curl --insecure https://kvdb.io/63vbmnEzTac6vpR5QLJMK9/${CIRCLE_WORKFLOW_ID:0:7})
+  #           OldWorkflowID=$(curl --insecure https://kvdb.io/WwrG1rKzrzdBiyWX5Q3YgW/${CIRCLE_WORKFLOW_ID:0:7})
   #           Stacks=$(cat ~/stacks.txt)
   #           echo OldWorkflowID: $OldWorkflowID
   #           echo Stack names: ${Stacks[@]}
@@ -483,8 +483,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
       # - deploy-backend:
       #     requires: [run-migrations]
       # - smoke-test:
